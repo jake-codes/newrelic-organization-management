@@ -1,2 +1,3 @@
 # Note: Must be for V2 User
 NEW_RELIC_USER_API_KEY: ''
+NEW_RELIC_SCIM_BEARER_TOKEN: ''
