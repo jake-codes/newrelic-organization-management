@@ -235,7 +235,7 @@ def main():
     # copy_group_roles_to_new_account(key, 'b16f57e5-be28-49e2-ae7c-9526bfb1f499', 'b16f57e5-be28-49e2-ae7c-9526bfb1f499', '1822040')
     # add_users_to_groups(key,['b16f57e5-be28-49e2-ae7c-9526bfb1f499'],[])
     # create_v2_users_from_csv_scim(token)
-    create_v2_users_from_csv_scim(token)
+    # create_v2_users_from_csv_scim(token)
 
     formatting.print_('Goodbye.\n')
 
