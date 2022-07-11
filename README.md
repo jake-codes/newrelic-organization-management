@@ -1,10 +1,6 @@
-# New Relic Organization Helper (wip)
+# New Relic Organization Helper (WIP)
 
-Creates some convenience methods for scripting organization updates/migrations. 
-
-The goal is to create some convenience methods for scripting organization updates/migrations. 
-
-Here's a few example methods:
+Creates a few convenience methods for scripting organization updates/migrations:
 
 - `list_accounts(key)`
 - `list_groups(key)`
