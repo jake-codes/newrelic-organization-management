@@ -230,7 +230,7 @@ def main():
     token = load_keys_file()['NEW_RELIC_SCIM_BEARER_TOKEN']
     
     # list_accounts(key)
-    # list_groups(key) # TODO....List GROUPS not auth domains
+    # list_groups(key)
     # list_roles(key)
     # list_auth_domains(key)
     # list_users_for_auth_domains(key, '<auth_id>')
