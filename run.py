@@ -54,10 +54,13 @@ def list_accounts(key):
     formatting.print_json(accounts, prefix='Accounts: ')
     return accounts
 
-def list_groups(key):
+def list_groups(key, auth_id_optional=None):
     get_results = lambda r: r['data']['actor']['organization']['authorizationManagement']['authenticationDomains']['authenticationDomains']
     get_cursor = lambda r: r['data']['actor']['organization']['authorizationManagement']['authenticationDomains']['nextCursor']
-    groups = _query_until_cursor_empty(graphql_queries.LIST_GROUPS_PER_AUTH_DOMAIN, key, get_results, get_cursor)
+    auth_domains = _query_until_cursor_empty(graphql_queries.LIST_GROUPS_PER_AUTH_DOMAIN, key, get_results, get_cursor)
+    if auth_id_optional:
+        auth_domains = [x for x in auth_domains if x['id'] == auth_id_optional]
+    groups = [x['groups']['groups'] for x in auth_domains]
     formatting.print_json(groups, prefix='Groups: ')
     return groups
 
@@ -108,7 +111,7 @@ def grant_group_access_to_role_for_account(key, group_id, account_id, role_id):
     if not group_id or not account_id or not role_id:
         formatting.print_error('Must include parameters to grant group access.')
 
-    mutation = graphql_queries.GRANT_GROUP_ACCESS_TO_ACCOUNT_AND_ROLE.replace('||GROUP_ID||', group_id).replace('||ACCOUNT_ID||', account_id).replace('||ROLE_ID||', role_id)
+    mutation = graphql_queries.GRANT_GROUP_ACCESS_TO_ACCOUNT_AND_ROLE.replace('||GROUP_ID||', group_id).replace('||ACCOUNT_ID||', str(account_id)).replace('||ROLE_ID||', role_id)
     error_message = 'Could not grant group access with group id: {}, account id: {}, role id: {}, key: {}'.format(group_id, account_id, role_id, key)
     results = _execute_mutation_or_raise_error(mutation, key, error_message)
     formatting.print_('Access grant created for group.')
@@ -135,18 +138,20 @@ def copy_group_roles_to_new_account(key, group_to_copy_from_id, group_to_copy_to
     for role_id in role_ids:
         grant_group_access_to_role_for_account(key, group_to_copy_to_id, account_id, '{}'.format(role_id))
 
-def add_users_to_groups(key, group_ids, user_ids):
-    if not group_ids or not len(group_ids) or not user_ids or not len(user_ids) or not key:
+def add_user_to_group(key, group_id, user_id):
+    if not group_id or not len(group_id) or not user_id or not len(user_id) or not key:
         formatting.print_error('Must include parameters to add users to groups.')
-    
-    group_ids_str = ','.join(group_ids)
-    user_ids_str = ','.join(user_ids)
 
-    mutation = graphql_queries.ADD_USERS_TO_GROUPS.replace('||GROUP_IDS||', group_ids_str).replace('||USER_IDS||', user_ids_str)
-    error_message = 'Could not add users to groups: {}\nusers:{}\nkey: {}'.format(group_ids_str, user_ids_str, key)
+    mutation = graphql_queries.ADD_USER_TO_GROUP.replace('||GROUP_ID||', str(group_id)).replace('||USER_ID||', str(user_id))
+    error_message = 'Could not add users to groups: {}\nusers:{}\nkey: {}'.format(str(group_id), str(user_id), key)
     results = _execute_mutation_or_raise_error(mutation, key, error_message)
-    formatting.print_('Users added to groups.')
+    formatting.print_('User ({}) added to group ({}).'.format(group_id, user_id))
     return results
+
+def add_users_to_groups(key, group_ids, user_ids):
+    for group_id in group_ids:
+        for user_id in user_ids:
+            add_user_to_group(key, group_id, user_id)
 
 def _execute_scimapi(data, url_suffix, token):
   # Graphql calls it 'cursor' instead of page
@@ -225,16 +230,15 @@ def main():
     token = load_keys_file()['NEW_RELIC_SCIM_BEARER_TOKEN']
     
     # list_accounts(key)
-    # list_groups(key)
+    # list_groups(key) # TODO....List GROUPS not auth domains
     # list_roles(key)
     # list_auth_domains(key)
-    # list_users_for_auth_domains(key, '877e9403-1d1b-43b1-b0b2-d53d24950eea')
-    # create_group(key, 'TestingScriptGroupCreate3', '877e9403-1d1b-43b1-b0b2-d53d24950eea')
-    # get_roles_for_group(key, 'b16f57e5-be28-49e2-ae7c-9526bfb1f499')
-    # grant_group_access_to_role_for_account(key, '2bf285da-08d0-445b-9665-061e2ec5e6ec', '1822040', '5198')
-    # copy_group_roles_to_new_account(key, 'b16f57e5-be28-49e2-ae7c-9526bfb1f499', 'b16f57e5-be28-49e2-ae7c-9526bfb1f499', '1822040')
-    # add_users_to_groups(key,['b16f57e5-be28-49e2-ae7c-9526bfb1f499'],[])
-    # create_v2_users_from_csv_scim(token)
+    # list_users_for_auth_domains(key, '<auth_id>')
+    # create_group(key, '<group_name>', '<group_id>')
+    # get_roles_for_group(key, '<group_id>')
+    # grant_group_access_to_role_for_account(key, '<group_id>', '<account_id>', '<role_id>')
+    # copy_group_roles_to_new_account(key, '<group_to_copy_from>', '<group_to_copy_to>', '<account_id>')
+    # add_users_to_groups(key,['group_id1, group_id2'],['user_id1, userid2'])
     # create_v2_users_from_csv_scim(token)
 
     formatting.print_('Goodbye.\n')

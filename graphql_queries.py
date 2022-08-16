@@ -153,8 +153,8 @@ GRANT_GROUP_ACCESS_TO_ACCOUNT_AND_ROLE = '''mutation {
 }
 '''
 
-ADD_USERS_TO_GROUPS = '''mutation {
-  userManagementAddUsersToGroups(addUsersToGroupsOptions: {groupIds: [||GROUP_IDS||], userIds: [||USER_IDS||]}) {
+ADD_USER_TO_GROUP = '''mutation {
+  userManagementAddUsersToGroups(addUsersToGroupsOptions: {groupIds: "||GROUP_ID||", userIds: "||USER_ID||"}) {
     groups {
       displayName
       id
