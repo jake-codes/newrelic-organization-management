@@ -1,4 +1,4 @@
-# New Relic Organization Helper (WIP)
+# New Relic Organization Helper
 
 Creates a few convenience methods for scripting organization updates/migrations:
 
@@ -11,5 +11,4 @@ Creates a few convenience methods for scripting organization updates/migrations:
 - `get_roles_for_group(key, '<GROUP_ID>')`
 - `grant_group_access_to_role_for_account(key, '<GROUP_ID>', '<ACCOUNT_ID>', '<ROLE_ID>')`
 - `copy_group_roles_to_new_account(key, '<GROUP_ID>', '<GROUP_ID_2>', '<ACCOUNT_ID>')`
-- `create_v2_users_from_csv_scim(<token>)`
-
+- `create_v2_users(key, '<NAME>', '<EMAIL>', '<AUTH_ID>')`
