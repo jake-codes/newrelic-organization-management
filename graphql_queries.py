@@ -53,18 +53,18 @@ LIST_GROUPS_PER_AUTH_DOMAIN = '''{
   actor {
     organization {
       authorizationManagement {
-        authenticationDomains {
+        authenticationDomains||AUTH_ID|| {
           authenticationDomains {
-            groups {
+            groups||CURSOR|| {
               groups {
                 id
                 displayName
               }
+              nextCursor
             }
             id
             name
           }
-          nextCursor
         }
       }
     }
@@ -132,6 +132,26 @@ LIST_ROLES_FOR_GROUP = '''{
   }
 }
 '''
+CREATE_USER = '''
+mutation {
+  userManagementCreateUser(createUserOptions: {userType: BASIC_USER_TIER, name: "||NAME||", email: "||EMAIL||", authenticationDomainId: "||AUTH_ID||"}) {
+    createdUser {
+      id
+    }
+  }
+}
+'''
+
+DELETE_GROUP = '''
+mutation {
+  userManagementDeleteGroup(groupOptions: {id: "||GROUP_ID||"}) {
+    group {
+      id
+    }
+  }
+}
+
+'''
 
 CREATE_GROUP = '''mutation {
   userManagementCreateGroup(createGroupOptions: {authenticationDomainId: "||AUTH_ID||", displayName: "||GROUP_NAME||"}) {
@@ -153,8 +173,8 @@ GRANT_GROUP_ACCESS_TO_ACCOUNT_AND_ROLE = '''mutation {
 }
 '''
 
-ADD_USER_TO_GROUP = '''mutation {
-  userManagementAddUsersToGroups(addUsersToGroupsOptions: {groupIds: "||GROUP_ID||", userIds: "||USER_ID||"}) {
+ADD_USERS_TO_GROUPS = '''mutation {
+  userManagementAddUsersToGroups(addUsersToGroupsOptions: {groupIds: ||GROUP_IDS||, userIds: ||USER_IDS||}) {
     groups {
       displayName
       id
